@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  TECHNICIAN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id              Int        @id @default(autoincrement())
+  name            String
+  email           String?    @unique
+  username        String     @unique
+  adSid           String?    @unique
+  role            Role       @default(EMPLOYEE)
+  roleLabel       String     @default("Academic")
+  departmentId    Int?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  tickets         Ticket[]   @relation("TicketEmployee")
+  assignedTickets Ticket[]   @relation("TicketTechnician")
+  comments        Comment[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
+  tickets   Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  tickets   Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  id           Int          @id @default(autoincrement())
+  title        String
+  description  String
+  priority     Priority     @default(MEDIUM)
+  status       TicketStatus @default(OPEN)
+  employeeId   Int
+  employee     User         @relation("TicketEmployee", fields: [employeeId], references: [id])
+  technicianId Int?
+  technician   User?        @relation("TicketTechnician", fields: [technicianId], references: [id])
+  departmentId Int
+  department   Department   @relation(fields: [departmentId], references: [id])
+  categoryId   Int
+  category     Category     @relation(fields: [categoryId], references: [id])
+  comments     Comment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([status, createdAt])
+  @@index([employeeId])
+  @@index([technicianId])
+  @@index([departmentId])
+  @@index([categoryId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ticketId, createdAt])
+}

@@ -1,0 +1,58 @@
+import { definePrismaConfig } from "prisma/config";
+
+// SQLite adapter configuration
+const sqliteAdapter = {
+  create: () => ({
+    // This is a simplified adapter for SQLite
+    // In practice, Prisma handles SQLite internally
+    async query(_query: string, _params: any[]) {
+      return [];
+    },
+    async transaction(_queries: Array<{ query: string; params: any[] }>) {
+      return [];
+    },
+    async disconnect() {
+      return;
+    },
+  }),
+  familyId: "sqlite",
+  id: "sqlite-adapter",
+  kind: "adapter",
+  targetId: "sqlite",
+  version: "1.0.0",
+};
+
+const sqliteFamily = {
+  create: () => ({
+    // Family implementation for SQLite
+    emit: () => ({}),
+  }),
+  emission: {},
+  familyId: "sqlite",
+  id: "sqlite-family",
+  kind: "family",
+  version: "1.0.0",
+};
+
+const sqliteTarget = {
+  create: () => ({
+    // Target implementation for SQLite
+    resolve: (_document: any) => {},
+  }),
+  familyId: "sqlite",
+  id: "sqlite-target",
+  kind: "target",
+  targetId: "sqlite",
+  version: "1.0.0",
+};
+
+export default definePrismaConfig({
+  orm: {
+    adapter: sqliteAdapter,
+    family: sqliteFamily,
+    target: sqliteTarget,
+  },
+  skills: {
+    agents: ["claude", "cursor", "agents", "devin"],
+  },
+});

@@ -1,0 +1,198 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("MAINTENANCE_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  users       User[]
+
+  @@map("roles")
+}
+
+model Department {
+  id       Int                  @id @default(autoincrement())
+  name     String               @unique
+  users    User[]
+  requests MaintenanceRequest[]
+
+  @@map("departments")
+}
+
+model MaintenanceCategory {
+  id       Int                  @id @default(autoincrement())
+  name     String               @unique
+  requests MaintenanceRequest[]
+
+  @@map("maintenance_categories")
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  username     String      @unique
+  displayName  String?
+  email        String?
+  adSid        String?     @unique
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  roleId       Int
+  role         Role        @relation(fields: [roleId], references: [id])
+  isActive     Boolean     @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  requests           MaintenanceRequest[] @relation("RequestedBy")
+  receivedRequests   MaintenanceRequest[] @relation("ReceivedBy")
+  assignedToRequests MaintenanceRequest[] @relation("AssignedTo")
+  assignedByRequests MaintenanceRequest[] @relation("AssignedBy")
+  startedRequests    MaintenanceRequest[] @relation("StartedBy")
+  completedRequests  MaintenanceRequest[] @relation("CompletedBy")
+  rejectedRequests   MaintenanceRequest[] @relation("RejectedBy")
+
+  assignments         RequestAssignment[] @relation("AssignedWorker")
+  createdAssignments  RequestAssignment[] @relation("AssignmentCreator")
+  comments            RequestComment[]
+  sparePartsRequested RequestSparePart[]  @relation("SparePartRequestedBy")
+  sparePartsReleased  RequestSparePart[]  @relation("SparePartReleasedBy")
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+model MaintenanceRequest {
+  id              Int                 @id @default(autoincrement())
+  ticketNumber    String              @unique
+  requesterId     Int
+  requester       User                @relation("RequestedBy", fields: [requesterId], references: [id])
+  departmentId    Int?
+  department      Department?         @relation(fields: [departmentId], references: [id])
+  categoryId      Int
+  category        MaintenanceCategory @relation(fields: [categoryId], references: [id])
+  priority        String              @default("Normal") // Normal, High, Urgent
+  description     String
+  location        String?
+  status          String              @default("SUBMITTED") // SUBMITTED, ASSIGNED, IN_PROGRESS, COMPLETED, REJECTED
+  receivedById    Int?
+  receivedBy      User?               @relation("ReceivedBy", fields: [receivedById], references: [id])
+  receivedAt      DateTime?
+  assignedToId    Int?
+  assignedTo      User?               @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedById    Int?
+  assignedBy      User?               @relation("AssignedBy", fields: [assignedById], references: [id])
+  assignedAt      DateTime?
+  startedById     Int?
+  startedBy       User?               @relation("StartedBy", fields: [startedById], references: [id])
+  startedAt       DateTime?
+  actionTaken     String?
+  maintenanceTime Int? // in minutes
+  completedById   Int?
+  completedBy     User?               @relation("CompletedBy", fields: [completedById], references: [id])
+  completedAt     DateTime?
+  finalReport     String?
+  rejectionReason String?
+  rejectedById    Int?
+  rejectedBy      User?               @relation("RejectedBy", fields: [rejectedById], references: [id])
+  rejectedAt      DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  assignments   RequestAssignment[]
+  comments      RequestComment[]
+  spareParts    RequestSparePart[]
+  attachments   RequestAttachment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@map("maintenance_requests")
+}
+
+model RequestAssignment {
+  id           Int                @id @default(autoincrement())
+  requestId    Int
+  request      MaintenanceRequest @relation(fields: [requestId], references: [id])
+  userId       Int
+  user         User               @relation("AssignedWorker", fields: [userId], references: [id])
+  assignedById Int
+  assignedBy   User               @relation("AssignmentCreator", fields: [assignedById], references: [id])
+  assignedAt   DateTime           @default(now())
+
+  @@unique([requestId, userId], name: "RequestAssignment_requestId_userId_key")
+  @@map("request_assignments")
+}
+
+model RequestComment {
+  id        Int                @id @default(autoincrement())
+  requestId Int
+  request   MaintenanceRequest @relation(fields: [requestId], references: [id])
+  userId    Int
+  user      User               @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@map("request_comments")
+}
+
+model RequestSparePart {
+  id            Int                @id @default(autoincrement())
+  requestId     Int
+  request       MaintenanceRequest @relation(fields: [requestId], references: [id])
+  partName      String
+  quantity      Int
+  requestedById Int
+  requestedBy   User               @relation("SparePartRequestedBy", fields: [requestedById], references: [id])
+  releasedById  Int?
+  releasedBy    User?              @relation("SparePartReleasedBy", fields: [releasedById], references: [id])
+  releasedAt    DateTime?
+  notes         String?
+
+  @@map("request_spare_parts")
+}
+
+model RequestAttachment {
+  id         Int                @id @default(autoincrement())
+  requestId  Int
+  request    MaintenanceRequest @relation(fields: [requestId], references: [id])
+  fileName   String
+  filePath   String
+  mimeType   String
+  size       Int // in bytes
+  uploadedAt DateTime           @default(now())
+
+  @@map("request_attachments")
+}
+
+model Notification {
+  id        Int                @id @default(autoincrement())
+  requestId Int
+  request   MaintenanceRequest @relation(fields: [requestId], references: [id])
+  recipient String // email
+  subject   String
+  body      String
+  status    String             @default("PENDING") // PENDING, SENT, FAILED
+  sentAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id        Int                 @id @default(autoincrement())
+  requestId Int?
+  request   MaintenanceRequest? @relation(fields: [requestId], references: [id])
+  userId    Int?
+  user      User?               @relation(fields: [userId], references: [id])
+  action    String
+  details   String? // JSON string
+  createdAt DateTime            @default(now())
+
+  @@map("audit_logs")
+}

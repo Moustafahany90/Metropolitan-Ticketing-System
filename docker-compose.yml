@@ -1,0 +1,72 @@
+# Metropolitan Ticketing System — unified stack (IT + Maintenance)
+#
+#   cp .env.example .env    # then edit secrets / AD settings
+#   docker compose up --build
+#
+#   SPA + API proxy : http://localhost:8080   (Nginx serves the SPA, proxies /api)
+#   API direct      : http://localhost:3000   (optional)
+#   Postgres        : localhost:5432
+#
+# The backend container applies Prisma migrations for BOTH databases and seeds
+# reference data on startup (migration-on-deploy).
+
+name: metropolitan-ticketing
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mts-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ticketing}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ticketing}
+      POSTGRES_DB: ${POSTGRES_DB:-ticketing}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - mts_pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ticketing} -d ${POSTGRES_DB:-ticketing}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mts-backend
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      # Container-network connection strings (override host-oriented .env values).
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ticketing}
+      MAINTENANCE_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${MAINTENANCE_DB:-maintenance}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    volumes:
+      - mts_uploads:/app/maintenance/uploads
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mts-web
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  mts_pgdata:
+  mts_uploads:

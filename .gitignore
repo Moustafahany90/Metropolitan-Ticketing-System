@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment - never commit secrets
+.env
+.env.local
+.env.production
+.env.test
+*.env.test
+backend/.env.test
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Prisma
+backend/prisma/*.db
+
+# Backups
+backups/
+
+# Maintenance uploads (runtime data)
+backend/maintenance/uploads/

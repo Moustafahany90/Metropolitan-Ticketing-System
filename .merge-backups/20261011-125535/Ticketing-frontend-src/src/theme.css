@@ -1,0 +1,32 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-400.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope-500.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --mts-primary: #693198;
+  --mts-primary-dark: #4f2174;
+  --mts-primary-soft: #f3eaf9;
+  --mts-gold: #f4bb4c;
+  --mts-gold-soft: #fdf3dd;
+  --mts-ink: #190721;
+  --mts-ink-muted: #5c5563;
+  --mts-bg: #ffffff;
+  --mts-surface: #f9f9f9;
+  --mts-border: #e5e1ea;
+  --mts-teal: #007f7d;
+
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Manrope", "Inter", system-ui, sans-serif;
+}

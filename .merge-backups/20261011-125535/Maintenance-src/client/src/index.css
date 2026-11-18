@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #190721;
+    background-color: #ffffff;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background-color: #f9f9f9;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Manrope', system-ui, sans-serif;
+    color: #190721;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@layer components {
+  .mms-input {
+    @apply w-full rounded-lg border border-mms-border bg-white px-3.5 py-2.5 text-sm text-mms-ink placeholder:text-mms-ink-muted/60 outline-none transition-colors duration-150 focus:border-mms-primary focus:ring-2 focus:ring-mms-primary/20;
+  }
+
+  .mms-label {
+    @apply mb-1.5 block text-[13px] font-medium text-mms-ink;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-mms-primary/20 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn bg-mms-primary px-4 text-white hover:bg-mms-primary-dark;
+  }
+
+  .btn-outline {
+    @apply btn border border-mms-border bg-white px-4 text-mms-ink hover:bg-mms-surface;
+  }
+
+  .btn-ghost {
+    @apply btn px-3 text-mms-ink-muted hover:bg-mms-surface hover:text-mms-ink;
+  }
+
+  .btn-lg {
+    @apply h-11;
+  }
+
+  .card {
+    @apply rounded-xl border border-mms-border bg-white shadow-card;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium;
+  }
+}

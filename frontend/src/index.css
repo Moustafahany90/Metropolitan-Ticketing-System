@@ -1,0 +1,204 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+@theme inline {
+  --color-primary: var(--mts-primary);
+  --color-primary-dark: var(--mts-primary-dark);
+  --color-primary-soft: var(--mts-primary-soft);
+  --color-gold: var(--mts-gold);
+  --color-gold-soft: var(--mts-gold-soft);
+  --color-ink: var(--mts-ink);
+  --color-ink-muted: var(--mts-ink-muted);
+  --color-app-bg: var(--mts-bg);
+  --color-surface: var(--mts-surface);
+  --color-border-soft: var(--mts-border);
+  --color-teal: var(--mts-teal);
+
+  /* Maintenance module aliases (unify legacy mms-* tokens onto host palette) */
+  --color-mms-primary: var(--mts-primary);
+  --color-mms-primary-dark: var(--mts-primary-dark);
+  --color-mms-primary-soft: var(--mts-primary-soft);
+  --color-mms-gold: var(--mts-gold);
+  --color-mms-gold-soft: var(--mts-gold-soft);
+  --color-mms-teal: var(--mts-teal);
+  --color-mms-ink: var(--mts-ink);
+  --color-mms-ink-muted: var(--mts-ink-muted);
+  --color-mms-bg: var(--mts-bg);
+  --color-mms-surface: var(--mts-surface);
+  --color-mms-border: var(--mts-border);
+
+  /* Maintenance workflow status tokens */
+  --color-status-submitted-bg: #ecfeff;
+  --color-status-submitted-fg: #0e7490;
+  --color-status-assigned-bg: #eff6ff;
+  --color-status-assigned-fg: #1d4ed8;
+  --color-status-progress-bg: #fffbeb;
+  --color-status-progress-fg: #b45309;
+  --color-status-completed-bg: #f0fdf4;
+  --color-status-completed-fg: #15803d;
+  --color-status-rejected-bg: #fef2f2;
+  --color-status-rejected-fg: #b91c1c;
+
+  /* Maintenance priority tokens */
+  --color-priority-normal-bg: #f1f5f9;
+  --color-priority-normal-fg: #475569;
+  --color-priority-high-bg: #fff7ed;
+  --color-priority-high-fg: #c2410c;
+  --color-priority-urgent-bg: #fef2f2;
+  --color-priority-urgent-fg: #b91c1c;
+
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
+
+  --shadow-card: 0 1px 2px 0 rgba(25, 7, 33, 0.05);
+  --animate-fade-in: fade-in 150ms ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--mts-ink);
+  background-color: var(--mts-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mts-primary);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .card {
+    border-radius: 0.75rem;
+    border: 1px solid var(--mts-border);
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgba(25, 7, 33, 0.05);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 9999px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+  }
+
+  .mms-input {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--mts-border);
+    background-color: #ffffff;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--mts-ink);
+    outline: none;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+
+  .mms-input::placeholder {
+    color: color-mix(in srgb, var(--mts-ink-muted) 60%, transparent);
+  }
+
+  .mms-input:focus {
+    border-color: var(--mts-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mts-primary) 20%, transparent);
+  }
+
+  .mms-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--mts-ink);
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-outline,
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 150ms, color 150ms, border-color 150ms;
+  }
+
+  .btn:disabled,
+  .btn-primary:disabled,
+  .btn-outline:disabled,
+  .btn-ghost:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--mts-primary);
+    color: #ffffff;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--mts-primary-dark);
+  }
+
+  .btn-outline {
+    border: 1px solid var(--mts-border);
+    background-color: #ffffff;
+    color: var(--mts-ink);
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    background-color: var(--mts-surface);
+  }
+
+  .btn-ghost {
+    color: var(--mts-ink-muted);
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--mts-surface);
+    color: var(--mts-ink);
+  }
+
+  .btn-lg {
+    height: 2.75rem;
+  }
+}
